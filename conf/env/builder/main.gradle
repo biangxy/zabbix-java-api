@@ -1,0 +1,367 @@
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.lang.System;
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+def releaseTime() {
+    return new Date().format("yyyyMMdd", TimeZone.getTimeZone("GMT+8"))
+}
+
+def getSvnVersion() {
+//    exec {
+//        commandLine "svn", "update"
+//        standardOutput = new ByteArrayOutputStream()
+//    }
+
+    def svnVersion = "XXX"
+    return svnVersion
+}
+
+def writeVersionFile(version_file, whole_version) {
+    def file = new File(version_file)
+    if (file.exists())
+        file.delete()
+    def printWriter = file.newPrintWriter()
+    println "version_file----->" + whole_version
+    printWriter.write(whole_version + "\n")
+    printWriter.flush()
+    printWriter.close()
+}
+
+def isMasterBranch() {
+    def projectDirStr = projectDir.absolutePath
+    if (projectDirStr ==~ /.*\/jobs\/.*\/workspace\/.*/) {
+        return "${projectDirStr}".contains("XXXXX-master")
+    }   
+    else {
+			if('git describe --all'.execute().text.trim().contains('feature')) {
+                 return false
+            }
+            else if('git describe --all'.execute().text.trim().contains('develop')){
+				 return false;
+            }
+            else {
+                 return true;
+            }
+   }
+}
+
+def javaModules() {
+    def A = subprojects.findAll {it.getBuildFile().exists() && it.getBuildFile().text.contains("mainClassName")}
+//    println "A---->" +A
+    return A
+}
+
+buildscript {
+	def gradlePluginRepoUrl = System.properties["REPO_XXXXX_DOWN"]
+    repositories {
+        maven { url gradlePluginRepoUrl }
+        //maven { url "gradle/libs" }
+    }
+
+    dependencies {
+        classpath 'org.akhikhl.gretty:gretty:+'
+//        classpath 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.13'
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.4.RELEASE")
+    }
+}
+
+//下载仓库url
+ext.downUrl=System.properties["REPO_XXXXX_DOWN"]
+//发布仓库url
+ext.releaseUrl=System.properties["REPO_XXXXX_RELEASE"]
+//快照仓库url
+ext.snapshotUrl=System.properties["REPO_XXXXX_SNAPSHOT"]
+ext.repositories_userName = System.properties["REPO_XXXXX_USERNAME"]
+ext.repositories_password = System.properties["REPO_XXXXX_PASSWORD"]
+
+ext.rootgroup = "com.xxxx"
+ext.rootversion = "4.1.10"
+ext.XXXXXVersion = "${rootversion}"
+// 0表示统一出包 1表示各出各的包 默认值:1
+ext.packageVersion = 1
+if (packageVersion == 0) {
+    version = rootversion
+}
+else {
+    if ("unspecified".equals(version)) {
+        version = rootversion
+    }
+    else {
+        // 从工程目录的gradle.properties文件中获取VERSION信息
+    }
+}
+
+if (!isMasterBranch()) {
+    version = "${version}-SNAPSHOT"
+    ext.XXXXXVersion = "${rootversion}-SNAPSHOT"
+    ext.snapshotPostFix = "-SNAPSHOT"
+}
+else {
+    ext.snapshotPostFix = ""
+}
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+//    apply plugin: 'net.ltgt.errorprone'
+
+//    if (project.hasProperty("enableErrorProne")) {
+//        apply plugin: "net.ltgt.errorprone"
+//    }
+
+ext.alpnApiVersion = "1.1.3.v20160715"
+ext.antlr4Version = "4.7"
+ext.annotationsVersion = "0.9"
+ext.aspectVersion = "1.6.11"
+ext.apacheHttpClientVersion = "4.4"
+ext.apacheHttpCoreVersion = "4.4"
+ext.bcprovVersion = "153"
+ext.bonecpVersion = "0.8.0.RELEASE"
+ext.boringsslVersion = "1.1.33.Fork24"
+ext.c3p0Version = "0.9.2.1"
+ext.commmonsDigesterVersion = "3.2"
+ext.commonCollections4Version = "4.1"
+ext.commonsBeanutilsVersion = "1.9.3"
+ext.commonsCliVersion = "1.3.1"
+ext.commonsCodecVersion = "1.10"
+ext.commonsCollectionsVersion = "3.2.2"
+ext.commonsConfigurationVersion = "1.10"
+ext.commonsIoVersion = "2.5"
+ext.commonsLangVersion = "3.5"
+ext.commonsLoggingVersion = "1.2"
+ext.commonsPoolVersion = "2.4.2"
+ext.configDir = "$rootProject.projectDir/config"
+ext.disruptorVersion = "3.3.0"
+ext.dom4jVersion = "1.6.1"
+ext.ehcacheVersion = "2.9.0"
+ext.elasticsearchVersion = "2.3.4"
+ext.fastjsonVersion = "1.2.60"
+ext.findbugsVersion = "3.0.1"
+ext.freemarkerVersion = "2.3.23"
+ext.gsonVersion = "2.8.2"
+ext.guavaVersion = "28.1-jre"
+ext.h2DatabaseVersion = "1.4.193"
+ext.hamcrestVersion = "1.3"
+ext.hibernateVersion = "5.1.4.Final"
+ext.hk2Version = "2.4.0-b34"
+ext.httpclientVersion = "4.4"
+ext.im4javaVersion = "1.4.0"
+ext.javassistVersion = "3.22.0-GA"
+ext.javaxAnnotationVersion = "1.2"
+ext.javaxValidationVersion = "1.1.0.Final"
+ext.javaxWsRsVersion = "2.0.1"
+ext.jedisVersion = "2.9.0"
+ext.jerseyClientVersion = "1.19.1"
+ext.jerseyJacksonVersion = "2.17"
+ext.jerseyServerVersion = "2.22.2"
+ext.objenesisVersion     = "2.4"
+ext.jettyServerVersion = "9.2.10.v20150310"
+ext.jettyServletVersion = "9.2.5.v20141112"
+ext.jettyHttpVersion = "9.2.10.v20150310"
+ext.jettyIOVersion = "9.2.10.v20150310"
+ext.jettyUtilVersion = "9.2.10.v20150310"
+ext.jettyVersion = "9.4.20.v20190813"
+ext.jodatimeVersion = "2.4"
+ext.junitVersion = "4.12"
+ext.logbackVersion = "1.2.3"
+ext.mapdbVersion = "1.0.6"
+ext.metadataExtractorVersion = "2.8.1"
+ext.metricsVersion = "3.1.2"
+ext.mmapdbVersion = "1.0.9"
+ext.mockitoVersion = "1.10.8"
+ext.mongoJavaDriverVersion = "3.0.0"
+ext.mongoVersion = "3.0.0"
+ext.XXXXXBaseUtilVersion = "1.6.0.r.+"
+ext.XXXXXMqttNettyParserVersion = "3.0.1.r.+"
+ext.XXXXXNotnoopVersion = "3.2.1.r.+"
+ext.mysqlVersion = "5.1.40"
+ext.reportVersion = "0.1-SNAPSHOT"
+ext.jacsonMapperVersion	= "1.9.13"
+ext.jacsonVersion = "2.9.3"
+ext.JsonVersion	= "20171018"
+ext.nettyVersion = "4.1.6.Final"
+ext.p3cPmdVersion = "1.3.3"
+ext.pahoVersion = "1.0.2"
+ext.proguardVersion = "4.4"
+ext.protobufVersion = "2.6.1"
+ext.pushyVersion = "0.9.2"
+ext.reportsDir = "$rootProject.projectDir/build/reports"
+ext.rocketmqVersion = "4.0.0"
+ext.rpmBuildDir = "/u01/SINO/rpmbuild"
+ext.servletApiVersion = "3.1.0"
+ext.slf4jVersion = "1.7.8"
+ext.springDataJpa = "1.11.0.RELEASE"
+ext.springDataMongodb = "1.10.0.RELEASE"
+ext.springDataRedisVersion = "1.8.0.RELEASE"
+ext.springFrameworkVersion = "4.3.6.RELEASE"
+ext.swaggerVersion = "1.5.15"
+ext.tcnativeVersion = "1.1.33.Fork24"
+ext.telnetdVersion = "2.1.1"
+ext.testngVersion = "6.9.6"
+ext.thriftVersion = "0.9.2"
+ext.tomcatJdbcVersion = "8.5.9"
+ext.xmpcoreVersion = "6.1.10"
+ext.zkclientVersion = "0.8"
+ext.zookeeperVersion = "3.4.6"
+ext.zabbixApiVersion = "1.8.1.r.+"
+ext.jMeterVersion = "0.9.+"
+ext.ateVersion = "2.0.0.r.+"
+ext.jsoupVersion = "1.11.3"
+ext.GsonVersion	= "2.8.2"
+ext.JsonVersion	= "20171018"
+
+dependencies {
+	compile("org.slf4j:slf4j-api:${slf4jVersion}")
+	compile("ch.qos.logback:logback-core:${logbackVersion}")
+	compile("ch.qos.logback:logback-classic:${logbackVersion}")
+	compile("org.slf4j:log4j-over-slf4j:${slf4jVersion}")
+	compile("org.slf4j:jcl-over-slf4j:${slf4jVersion}")
+	compile("org.slf4j:jul-to-slf4j:${slf4jVersion}")
+	compile("com.alibaba:fastjson:${fastjsonVersion}")
+
+	compile("proguard.annotations:annotations:${annotationsVersion}")
+
+	compile("org.apache.commons:commons-lang3:${commonsLangVersion}")
+	compile("org.apache.commons:commons-digester3:${commmonsDigesterVersion}") {
+		exclude group: 'commons-logging', module: 'commons-logging'
+	}
+
+	compile("org.apache.commons:commons-pool2:${commonsPoolVersion}")
+
+	compile("commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}") {
+		exclude group: 'commons-logging', module: 'commons-logging'
+	}
+	compile("commons-collections:commons-collections:${commonsCollectionsVersion}")
+	compile("commons-io:commons-io:${commonsIoVersion}")
+	compile("commons-configuration:commons-configuration:${commonsConfigurationVersion}")
+	compile("commons-codec:commons-codec:${commonsCodecVersion}")
+	compile("commons-cli:commons-cli:${commonsCliVersion}")
+
+	compile("com.google.guava:guava:${guavaVersion}")
+	
+	compile("org.log.bid:log-bid-agent:0.3")
+	compile("org.javassist:javassist:${javassistVersion}")
+	
+	compile("com.google.code.findbugs:annotations:${findbugsVersion}")
+	testCompile("junit:junit:${junitVersion}")
+}
+
+task sourceJar(type: Jar) {
+	from sourceSets.main.allJava
+}
+
+task copyVersion() {
+	outputs.file new File("$projectDir/VERSION.txt")
+	doLast {
+		String projectDir = "${projectDir}";
+		String servieName = projectDir.substring(projectDir.lastIndexOf(System.getProperty("file.separator")) + 1);
+		writeVersionFile("${projectDir}/VERSION.txt", "${servieName}-${version}")
+		copy {
+			from "${projectDir}/VERSION.txt"
+			into "$buildDir"
+		}
+	}
+}
+
+task copyStartScript(type: Copy) {
+        outputs.file new File("$projectDir/conf/env/script/XXXXX-xxx.sh")
+        outputs.file new File("$projectDir/conf/env/script/add-auto-start.sh")
+}
+
+task copyRpmToAutoDeploy(type: Copy) {
+	String projectDir = "${projectDir}";
+	String serviceName = projectDir.substring(projectDir.lastIndexOf(System.getProperty("file.separator")) + 1);
+	println buildDir;
+	println serviceName;
+	println "==========="
+
+	FileTree tree = fileTree(dir: "/u01/.jenkins/jobs/XXXXX-Tool/workspace/auto-deploy/services/packages/", include: '**/*.rpm')
+	tree.each { File file ->
+		delete file
+	}
+}
+
+configure(javaModules()) {
+	apply plugin: 'distribution'
+}
+
+task XXXXXDistTar(type: Tar) {
+	dependsOn javaModules().distTar
+}
+
+group = rootgroup
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+ext.XXXXXDefaultJvmArgs = [
+		"-javaagent:lib/log-bid-agent-0.3.jar",
+		"-Dsun.rmi.dgc.client.gcInterval=21600000",
+		"-Dsun.rmi.dgc.server.gcInterval=21600000",
+		"-XX:+HeapDumpOnOutOfMemoryError",
+		"-Dlogback.configurationFile=conf/logback.xml",
+		"-server",
+		//print the gc info to the file gc.log
+		"-Xloggc:gc.log",
+		"-XX:+PrintGCCause",
+		"-XX:+PrintGCDetails",
+		"-XX:+PrintGCDateStamps",
+		"-XX:+PrintHeapAtGC"]
+		
+repositories {
+	//mavenCentral()
+	maven { url downUrl }
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+
+			artifact sourceJar {
+				classifier "sources"
+			}
+
+			pom.withXml {
+				asNode().appendNode('description', 'A demonstration of Maven POM customization')
+			}
+		}
+	}
+
+	repositories {
+		maven {
+			if ("${version}".contains("SNAPSHOT")) {
+				url snapshotUrl
+			} else {
+				url releaseUrl
+			}
+			credentials {
+				username repositories_userName
+				password repositories_password
+			}
+		}
+	}
+}
+
+ext.configDir = "$rootProject.projectDir/config"
+ext.reportsDir = "$rootProject.projectDir/build/reports"
+ext.checkstyleConfigDir = new File(configDir, "checkstyle")
+ext.checkstyleReportsDir = new File(reportsDir, "checkstyle")
+ext.xslStyleFile = new File(checkstyleConfigDir, "checkstyle-noframes.xsl")
+ext.rpmBuildDir = "/u01/SINO/rpmbuild"
+
+
+
+//    Error Prone静态检测
+//    configurations.errorprone {
+//        resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.1.3'
+//    }
+
+configurations.all {
+	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+	resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+}

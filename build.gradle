@@ -1,0 +1,22 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+apply from: "conf/env/builder/main.gradle"
+
+dependencies {
+    compile("org.slf4j:slf4j-api:${slf4jVersion}")
+	compile("org.apache.commons:commons-digester3:${commmonsDigesterVersion}")
+	compile("com.google.guava:guava:${guavaVersion}")
+	compile("org.codehaus.jackson:jackson-mapper-asl:${jacsonMapperVersion}")
+	compile("org.apache.httpcomponents:httpclient:${httpclientVersion}")
+	compile("com.google.code.gson:gson:${GsonVersion}")
+	compile("org.json:json:${JsonVersion}")
+	compile("com.alibaba:fastjson:${fastjsonVersion}")
+	compile("junit:junit:${junitVersion}")
+}
+
+mainClassName = 'zabbix.api.util.ZabbixLoginUtil'
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
